@@ -37,14 +37,39 @@ class Day4(DayBase):
 
             if rising_cond and repeat_cond:
                 number_of_possible_pass = number_of_possible_pass + 1
-                print(val)
 
         print(f"part1: {number_of_possible_pass}")
 
     def solve2(self):
         self.process_input()
-	
-        print(f"part2: {0}")
+
+        number_of_possible_pass = 0
+
+        for i in range (self._down_range, self._up_range + 1):
+            rising_cond = True
+            streak_cond = False
+
+            val = str(i)
+            prev_val = int(val[0])
+            streak = 1
+            for j in range(1, len(val)):
+                if int(val[j]) == prev_val:
+                    streak = streak + 1
+                else:
+                    if streak != 1 and streak / 2 == 1:
+                        streak_cond = True
+                    streak = 1
+                if int(val[j]) < prev_val:
+                    rising_cond = False
+                prev_val = int(val[j])
+
+            if streak != 1 and streak / 2 == 1:
+                streak_cond = True
+
+            if rising_cond and streak_cond:
+                number_of_possible_pass = number_of_possible_pass + 1
+
+        print(f"part2: {number_of_possible_pass}")
 
 
 if __name__ == "__main__":
