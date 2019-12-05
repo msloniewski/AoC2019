@@ -10,7 +10,7 @@ class Day5(DayBase):
         self._instructions = None
 
     def process_input(self):
-        self._instructions = self._file.readline()
+        self._instructions = re.sub("\s*", "", self._file.readline())
         self._instructions = re.split(",", self._instructions)
 
     def _give_param_val(self, param_modes, param_num, param):
@@ -35,19 +35,49 @@ class Day5(DayBase):
                 operand1 = self._give_param_val(parameters_modes, 0, int(self._instructions[i + 1]))
                 operand2 = self._give_param_val(parameters_modes, 1, int(self._instructions[i + 2]))
                 destination = int(self._instructions[i + 3])
-                if opcode == 1:
+                if opcode == 1: # add
                     self._instructions[destination] = str(operand1 + operand2)
-                else:
+                else: # mult
                     self._instructions[destination] = str(operand1 * operand2)
                 i = i + 4
-            elif opcode == 3:
+            elif opcode == 3: # scan
                 val = input("Provide value:")
                 self._instructions[int(self._instructions[i + 1])] = val
                 i = i + 2
-            elif opcode == 4:
+            elif opcode == 4: # print
                 operand = self._give_param_val(parameters_modes, 0, int(self._instructions[i + 1]))
                 print(f'value: {operand}')
                 i = i + 2
+            elif opcode == 5: # jmp if true
+                operand = self._give_param_val(parameters_modes, 0, int(self._instructions[i + 1]))
+                if operand != 0:
+                    i  = self._give_param_val(parameters_modes, 1, int(self._instructions[i + 2]))
+                else:
+                    i = i + 3
+            elif opcode == 6: # jmp if false
+                operand = self._give_param_val(parameters_modes, 0, int(self._instructions[i + 1]))
+                if operand == 0:
+                    i = self._give_param_val(parameters_modes, 1, int(self._instructions[i + 2]))
+                else:
+                    i = i + 3
+            elif opcode == 7: # less than
+                operand1 = self._give_param_val(parameters_modes, 0, int(self._instructions[i + 1]))
+                operand2 = self._give_param_val(parameters_modes, 1, int(self._instructions[i + 2]))
+                destination = int(self._instructions[i + 3])
+                if operand1 < operand2:
+                    self._instructions[destination] = str(1)
+                else:
+                    self._instructions[destination] = str(0)
+                i = i + 4
+            elif opcode == 8: # eq
+                operand1 = self._give_param_val(parameters_modes, 0, int(self._instructions[i + 1]))
+                operand2 = self._give_param_val(parameters_modes, 1, int(self._instructions[i + 2]))
+                destination = int(self._instructions[i + 3])
+                if operand1 == operand2:
+                    self._instructions[destination] = str(1)
+                else:
+                    self._instructions[destination] = str(0)
+                i = i + 4
             else:
                 print(f'Unknown opcode {opcode}')
                 exit()
@@ -56,15 +86,13 @@ class Day5(DayBase):
         self.process_input()
 
         self._compute_program()
-
-        #print(f"part1: {self._instructions[0]}")
+        print("Part 1 done")
 
     def solve2(self):
         self.process_input()
 
-
-        print(f"part2: {0}")
-
+        self._compute_program()
+        print("Part 2 done")
 
 if __name__ == "__main__":
     dayPart1 = Day5()
