@@ -35,8 +35,23 @@ class Day8(DayBase):
 
     def solve2(self):
         self.process_input()
+        print(f"part2:")
 
-        print(f"part2: {0}")
+        image = ["2"] * self._layer_size
+
+        for layer in self._layers:
+            for i, pixel in enumerate(image):
+                if pixel == "2":
+                    image[i] = layer[i]
+
+        for i in range(0, self._height):
+            line = []
+            for pixel in image[i*self._width:(i+1)*self._width]:
+                if pixel == "1":
+                    line.append(u"\u2588")
+                else:
+                    line.append(" ")
+            print("".join(line))
 
 
 if __name__ == "__main__":
