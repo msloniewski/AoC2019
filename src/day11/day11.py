@@ -65,6 +65,18 @@ class Plate:
             sum = sum + len(self.board[x])
         return sum
 
+    def print_plate(self):
+        for line in sorted(self.board.keys()):
+            line_to_print = []
+            for tile in sorted(self.board[line].keys()):
+                while len(line_to_print) < tile:
+                    line_to_print.append(" ")
+                if self.board[line][tile] == 1:
+                    line_to_print.append("\u2588")
+                else:
+                    line_to_print.append(" ")
+            print("".join(line_to_print))
+
 
 class Day11(DayBase):
 
@@ -233,8 +245,24 @@ class Day11(DayBase):
     def solve2(self):
         self.process_input()
 
-        self._compute_program()
+        robot = Robot()
+        plate = Plate()
 
+        plate.set_color(0, 0, 1)
+
+        run = True
+        while run:
+            stop_cause, output = self._compute_program(False, [plate.get_color(robot.x, robot.y)])
+            if stop_cause == ReturnCause.program_stop:
+                run = False
+            plate.set_color(robot.x, robot.y, output[0])
+            if output[1] == 0:
+                robot.turn_left()
+            else:
+                robot.turn_right()
+            robot.move_forward()
+
+        plate.print_plate()
         print(f"Part 2: done")
 
 if __name__ == "__main__":
