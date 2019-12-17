@@ -23,6 +23,7 @@ class Day14(DayBase):
     def __init__(self):
         super(Day14, self).__init__()
         self.reactions = []
+        self._amount_needed_per_one_fuel = []
 
     def _find_reaction(self, product):
         for reaction in self.reactions:
@@ -42,7 +43,6 @@ class Day14(DayBase):
             substrates.append(new_substrate)
 
         return substrates
-
 
     def process_input(self):
         for line in self._file.readlines():
@@ -78,10 +78,8 @@ class Day14(DayBase):
                     needed.append(False)
         return functools.reduce(lambda x, y: x or y, needed)
 
-    def solve1(self):
-        self.process_input()
-
-        substrates_needed = [Substrate("FUEL", 1)]
+    def _solve(self, what, how_much):
+        substrates_needed = [Substrate(what, how_much)]
 
         only_needed_ore = False
         while not only_needed_ore:
@@ -89,28 +87,51 @@ class Day14(DayBase):
             for substrate_needed in substrates_needed:
                 if substrate_needed.name != "ORE":
                     reaction_needed = self._find_reaction(substrate_needed)
-                    #if reaction_needed.substrates[0].name != "ORE":
                     if not self.is_sub_needed_somewhere_else(substrate_needed, substrates_needed):
                         only_needed_ore = False
                         reaction_result_amount = reaction_needed.result.amount
                         needed_amount = substrate_needed.amount
                         times_reaction = math.ceil(needed_amount / reaction_result_amount)
+                        self._amount_needed_per_one_fuel.append([substrate_needed.name,
+                                                                 substrate_needed.amount * times_reaction])
 
                         for ingredient in reaction_needed.substrates:
                             sub_to_add = Substrate(ingredient.name, ingredient.amount * times_reaction)
                             substrates_needed = self.add_substrate(substrates_needed, sub_to_add)
                         substrates_needed.remove(substrate_needed)
-                    for _ in substrates_needed:
-                        print(_.name, _.amount)
-                    print("")
+        return substrates_needed[0].amount
 
-        print(f"part1: {substrates_needed[0].amount}")
+    def solve1(self):
+        self.process_input()
+
+        ans = self._solve("FUEL", 1)
+
+        print(f"part1: {ans}")
 
     def solve2(self):
         self.process_input()
 
+        target = int(1e12)
+        lower_bound = 0
+        upper_bound = target
 
-        print(f"part2: {0}")
+        changed = True
+        center = 0
+        while changed:
+            changed = False
+            center = (lower_bound + upper_bound) // 2
+            result = self._solve("FUEL", center)
+            if result >= target:
+                if upper_bound != center:
+                    upper_bound = center
+                    changed = True
+            if result <= target:
+                if lower_bound != center:
+                    changed = True
+                    lower_bound = center
+            print (lower_bound, upper_bound)
+
+        print(f"part2: {center}")
 
 
 if __name__ == "__main__":
