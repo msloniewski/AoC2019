@@ -48,6 +48,7 @@ class Tile:
         for i, state in enumerate(self.directions):
             if state == NeighbourTileState.entry_point:
                 return i + 1
+        return 5
 
 
 class Day15(DayBase):
@@ -224,7 +225,60 @@ class Day15(DayBase):
     def solve2(self):
         self.process_input()
 
-        print(f"Part 2: done")
+        road = [Tile(5)]
+
+        oxygen_found = False
+        while not oxygen_found:
+            direction = road[-1].get_first_not_visited()
+            backtrace = False
+            if direction == 5:
+                backtrace = True
+                direction = road[-1].get_entry_point()
+            _input = [direction]
+            result = self._compute_program(False, _input)[1][0]
+            if backtrace:
+                road = road[:-1]
+                if result == 0:
+                    print("wtf")
+            else:
+                if result == 0:
+                    pass
+                if result == 1:
+                    road.append(Tile(Tile.make_inverse(direction)))
+                if result == 2:
+                    road.append(Tile(Tile.make_inverse(direction)))
+                    oxygen_found = True
+
+        # LETS DO DIS AGAIN
+        road = [Tile(5)]
+        all_searched = False
+        farthest_point = 0
+        while not all_searched:
+            direction = road[-1].get_first_not_visited()
+            backtrace = False
+            if direction == 5:
+                backtrace = True
+                direction = road[-1].get_entry_point()
+                if direction == 5:
+                    all_searched = True
+                    break
+            _input = [direction]
+            result = self._compute_program(False, _input)[1][0]
+            if backtrace:
+                road = road[:-1]
+                if result == 0:
+                    print("wtf")
+            else:
+                if result == 0:
+                    pass
+                if result == 1:
+                    road.append(Tile(Tile.make_inverse(direction)))
+                if result == 2:
+                    road.append(Tile(Tile.make_inverse(direction)))
+            farthest_point = max(farthest_point, len(road))
+
+
+        print(f"Part 2: {farthest_point - 1}")
 
 if __name__ == "__main__":
     dayPart1 = Day15()
